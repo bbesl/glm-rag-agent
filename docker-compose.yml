@@ -1,0 +1,49 @@
+# ── Docker Compose：FastAPI + Redis 两容器 ──
+# 第 ② 课已启用 Redis（api 容器自动连 redis://redis:6379/0）
+# chroma_data 卷持久化 FAQ 向量库，redis_data 卷持久化会话
+
+services:
+  # ── FastAPI 客服 API（主服务） ──
+  api:
+    build: .
+    ports:
+      # 宿主端口用 8080：Windows 下 8000 可能落在 Hyper-V 保留端口段内导致 bind 失败
+      # 容器内仍是 8000，访问地址 http://localhost:8080
+      - "8080:8000"
+    env_file:
+      - .env
+    environment:
+      # 容器内连 Redis 用服务名（不是 localhost）
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      # Chroma 向量库持久化：容器删了 FAQ 数据不丢
+      - chroma_data:/app/.chroma_faq
+      # FAQ 知识库挂出来，热更新不用重建镜像
+      - ./faq_knowledge.txt:/app/faq_knowledge.txt:ro
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy  # Redis 健康后 api 才启动
+    healthcheck:
+      # 容器内用 python 自带 http.client 检查，镜像里没装 curl
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ── Redis 会话存储 ──
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  chroma_data:
+  redis_data:

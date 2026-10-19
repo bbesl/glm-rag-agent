@@ -1,0 +1,16 @@
+# ── Docker 构建忽略 ──
+# 容器里不需要这些东西，减小 build context
+.venv/
+__pycache__/
+*.pyc
+.chroma_db/
+.chroma_faq/
+.chroma_pdf/
+*.log
+.env
+.idea/
+.vscode/
+*.md
+*.pdf
+README.md
+xyz_handbook.pdf

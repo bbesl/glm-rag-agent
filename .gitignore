@@ -1,0 +1,49 @@
+# ===== 敏感文件（绝对不能提交）=====
+# API key 在这里，提交了等于密码泄露
+.env
+.env.local
+.env.*
+!.env.example
+
+
+# ===== Python 虚拟环境（几百兆，且可重建）=====
+.venv/
+venv/
+env/
+ENV/
+
+
+# ===== Python 缓存 =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+
+# ===== Chroma 向量库（运行时自动重建，无需提交）=====
+.chroma_db/
+.chroma_faq/
+*.sqlite3
+
+
+# ===== 日志文件 =====
+llm_calls.log
+*.log
+
+
+# ===== Streamlit 缓存 =====
+.streamlit/
+
+
+# ===== IDE / 编辑器 =====
+.vscode/
+.idea/
+*.swp
+*.swo
+
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+desktop.ini
